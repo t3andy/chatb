@@ -243,6 +243,11 @@ PROMPTFLOW_REQUEST_FIELD_NAME = os.environ.get("PROMPTFLOW_REQUEST_FIELD_NAME", 
 PROMPTFLOW_RESPONSE_FIELD_NAME = os.environ.get(
     "PROMPTFLOW_RESPONSE_FIELD_NAME", "reply"
 )
+#GridData Get
+UI_PRECANNED_PROMPTS = os.environ.get("UI_PRECANNED_PROMPTS")
+UI_PRECANNED_PROMPT_NAMES = os.environ.get("UI_PRECANNED_PROMPT_NAMES")
+UI_PRECANNED_PROMPT_DESCRIPTIONS = os.environ.get("UI_PRECANNED_PROMPT_DESCRIPTIONS")
+UI_CHAT_EMPTY_TEXT_HINT = os.environ.get("UI_CHAT_EMPTY_TEXT_HINT")
 # Frontend Settings via Environment Variables
 AUTH_ENABLED = os.environ.get("AUTH_ENABLED", "true").lower() == "true"
 CHAT_HISTORY_ENABLED = (
@@ -263,6 +268,12 @@ frontend_settings = {
         "show_share_button": UI_SHOW_SHARE_BUTTON,
     },
     "sanitize_answer": SANITIZE_ANSWER,
+"grid_model" : {
+    "chat_empty_text_hint": UI_CHAT_EMPTY_TEXT_HINT,
+    "precanned_prompts": UI_PRECANNED_PROMPTS,
+    "precanned_prompt_names": UI_PRECANNED_PROMPT_NAMES,
+    "precanned_prompt_descriptions": UI_PRECANNED_PROMPT_DESCRIPTIONS,
+}
 }
 
 
