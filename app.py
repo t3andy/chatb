@@ -3,6 +3,7 @@ import json
 import os
 import logging
 import uuid
+import requests
 from dotenv import load_dotenv
 import httpx
 from quart import (
@@ -254,6 +255,14 @@ CHAT_HISTORY_ENABLED = (
     and AZURE_COSMOSDB_CONVERSATIONS_CONTAINER
 )
 SANITIZE_ANSWER = os.environ.get("SANITIZE_ANSWER", "false").lower() == "true"
+
+INDEX_NAME=os.environ.get("INDEX_NAME")
+SEARCH_SERVICE_NAME = os.environ.get("SEARCH_SERVICE_NAME")
+SEARCH_API_KEY=os.environ.get("SEARCH_API_KEY")
+file_path = os.path.join(os.getcwd(), "backend/system-prompt.txt")
+with open(file_path, "r") as file:
+    AZURE_OPENAI_SYSTEM_MESSAGE= file.read()
+
 frontend_settings = {
     "auth_enabled": AUTH_ENABLED,
     "feedback_enabled": AZURE_COSMOSDB_ENABLE_FEEDBACK and CHAT_HISTORY_ENABLED,
@@ -424,7 +433,7 @@ def get_configured_data_source():
         # Set authentication
         authentication = {}
         if AZURE_SEARCH_KEY:
-            authentication = {"type": "api_key", "api_key": AZURE_SEARCH_KEY}
+            authentication = {"type": "api_key", "key": AZURE_SEARCH_KEY}
         else:
             # If key is not provided, assume AOAI resource identity has been granted access to the search service
             authentication = {"type": "system_assigned_managed_identity"}
@@ -746,7 +755,6 @@ def prepare_model_args(request_body):
         "stream": SHOULD_STREAM,
         "model": AZURE_OPENAI_MODEL,
     }
-
     if SHOULD_USE_DATA:
         model_args["extra_body"] = {"data_sources": [get_configured_data_source()]}
 
@@ -835,6 +843,9 @@ async def send_chat_request(request):
     try:
         azure_openai_client = init_openai_client()
         raw_response = await azure_openai_client.chat.completions.with_raw_response.create(**model_args)
+        # rest_url = f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_MODEL_NAME}/chat/completions?api-version=2024-02-01"
+        # headers = {"api-key": AZURE_OPENAI_KEY, "Content-Type": "application/json"}
+        # raw_response = requests.post(url=rest_url, headers=headers, json=model_args)        
         response = raw_response.parse()
         apim_request_id = raw_response.headers.get("apim-request-id") 
     except Exception as e:
